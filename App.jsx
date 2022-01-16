@@ -34,13 +34,13 @@ export default function App() {
     firebase.app();
   }
   const [items, setItems] = useState([]);
-  // useEffect(() => {
-  //   TimeController.getAllTimes().then((res) => {
-  //     setItems(res);
-  //   }).catch((err) => {
-  //     throw err;
-  //   });
-  // }, []);
+  useEffect(() => {
+    TimeController.getAllTimes().then((res) => {
+      setItems(res);
+    }).catch((err) => {
+      throw err;
+    });
+  }, []);
   const [lastestTime, setLastestTime] = useState([]);
   useEffect(() => {
     TimeController.getLastestTime().then((res) => {
@@ -56,7 +56,12 @@ export default function App() {
       setItems(res);
       setRefreshing(false);
     });
+    TimeController.getLastestTime().then((res) => {
+      setLastestTime(res);
+      setRefreshing(false);
+    });
   };
+
   return (
     <ScrollView
       style={styles.scrollView}
@@ -69,24 +74,27 @@ export default function App() {
     >
       <View style={styles.container}>
         <Text>{'\n \n'}</Text>
-        <Button
-          onPress={TimeController.AllTime}
-          title="get all time"
-          color="#007FFF"
-        />
-        <Text>{'\n'}</Text>
+
         <Button
           onPress={TimeController.addCurrentTime}
-          title="add current time"
+          title="add current time(不知道為甚麼要手動刷新)"
           color="#00FF00"
         />
         <Text>{'\n'}</Text>
         <Button
-          onPress={TimeController.deleteEarliestTime}
+          onPress={() => {
+            TimeController.deleteEarliestTime().then(() => { onRefresh(); });
+          }}
           title="delete earliest time"
           color="#FF0000"
         />
       </View>
+      <Text>{'\n'}</Text>
+      <Button
+        onPress={TimeController.getAllTimes}
+        title="get all time"
+        color="#007FFF"
+      />
       <Text>{'\n   All Time'}</Text>
       { items.map((item) => (
         <Card
@@ -98,6 +106,7 @@ export default function App() {
           </Card.Content>
         </Card>
       ))}
+      <Text>{'\n'}</Text>
       <Button
         onPress={() => {
           TimeController.getLastestTime().then(() => { onRefresh(); });
@@ -106,13 +115,13 @@ export default function App() {
         color="#FFBF00"
       />
       <Text>{'\n   Lastest Time'}</Text>
-      { lastestTime.map((item) => (
+      { lastestTime.map((lastItem) => (
         <Card
-          key={item.id}
+          key={lastItem.id}
           style={{ flex: 1, padding: 10, margin: 4 }}
         >
           <Card.Content>
-            <Text>{`${item.time}`}</Text>
+            <Text>{`${lastItem.time}`}</Text>
           </Card.Content>
         </Card>
       ))}

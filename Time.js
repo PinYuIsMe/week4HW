@@ -24,17 +24,18 @@ function TimeEmpty() {
 async function getLastestTime() {
   const db = firebase.firestore();
   const LastestRef = db.collection('time').orderBy('time', 'asc').limitToLast(1);
+  const times = [];
   const snapshot = await LastestRef.get();
   if (snapshot.empty) {
     return TimeEmpty();
   }
-  const times = [];
   snapshot.forEach((doc) => {
     times.push({
       id: doc.id,
       time: toDateString(doc.data().time),
     });
   });
+  console.log(times);
   return times;
 }
 
@@ -49,6 +50,7 @@ async function getAllTimes() {
       time: toDateString(doc.data().time),
     });
   });
+  console.log(timesArray);
   return timesArray;
 }
 
